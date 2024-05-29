@@ -3,7 +3,6 @@ package com.MPKA_Group.demo.config;
 import java.security.Key;
 import java.util.Date;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +23,7 @@ public class JwtTokenProvider {
 	@Value("${app.jwt-expiration}")
 	private long jwtExpirationDate; 
 	
+	@SuppressWarnings("deprecation")
 	public String generateToken(org.springframework.security.core.Authentication authentication)
 	{
 		String username = authentication.getName();
@@ -44,23 +44,25 @@ public class JwtTokenProvider {
 		return Keys.hmacShaKeyFor(bytes);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public String getUsername(String token)
 	{
-		Claims claims = Jwts.parserBuilder()
+		Claims claims = Jwts.parser()
 				.setSigningKey(Key())
 				.build()
-				.parseClaimsjws(token)
+				.parseClaimsJws(token)
 				.getBody();
 		
 		return claims.getSubject();
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	public boolean validateToken(String token)
 	{
 		try
 		{
-			Jwts.parserBuilder()
+			Jwts.parser()
 			.setSigningKey(Key())
 			.build()
 			.parse(token);
