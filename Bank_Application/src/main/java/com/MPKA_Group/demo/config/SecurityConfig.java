@@ -26,9 +26,10 @@ import lombok.AllArgsConstructor;
 public class SecurityConfig {
 
     @SuppressWarnings("unused")
-    private final UserDetailsService userDetailsService = null;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
-
+	private final UserDetailsService userDetailsService = null;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(null, userDetailsService);
+    //private final JwtAuthenticationFilter jwtAuthenticationFilter = null;
+    
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
