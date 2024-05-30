@@ -23,46 +23,41 @@ import lombok.AllArgsConstructor;
 @EnableWebSecurity
 @EnableMethodSecurity
 @AllArgsConstructor
-public class SecurityConfig 
-{	
-	private final UserDetailsService userDetailsService = null;
-	
-	private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
-	
-	@Bean
-	public PasswordEncoder passwordEncoder()
-	{
-		return new BCryptPasswordEncoder();
-	}
-	
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception
-	{
-		return configuration.getAuthenticationManager();
-	}
-	
-	@Bean
-	public AuthenticationProvider authenticationProvider()
-	{
-		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-		authenticationProvider.setUserDetailsService(userDetailsService);
-		authenticationProvider.setPasswordEncoder(passwordEncoder());
-		return authenticationProvider();
-	}
-	
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception 
-	{
-		httpSecurity.csrf(csrf -> csrf.disable())
-			.authorizeHttpRequests(authorize -> 
-			   authorize.requestMatchers(HttpMethod.POST,"/bank/add").permitAll()
-			   .requestMatchers(HttpMethod.POST,"/bank/add/login").permitAll()
-			   .anyRequest().authenticated());
-		
-		httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		httpSecurity.authenticationProvider(authenticationProvider());
-		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-		return httpSecurity.build();
-	}
+public class SecurityConfig {
 
+    @SuppressWarnings("unused")
+    private final UserDetailsService userDetailsService = null;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        return authenticationProvider;
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider) throws Exception {
+        httpSecurity.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(authorize -> 
+                authorize.requestMatchers(HttpMethod.POST, "/bank/add").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/bank/add/login").permitAll()
+                    .anyRequest().authenticated());
+
+        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.authenticationProvider(authenticationProvider);
+        httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+    }
 }
