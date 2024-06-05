@@ -14,6 +14,10 @@ import lombok.AllArgsConstructor;
 public class CustomerUserDetailsService implements UserDetailsService {
 	
 	private UserRepository userRepository;
+	
+	public CustomerUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
