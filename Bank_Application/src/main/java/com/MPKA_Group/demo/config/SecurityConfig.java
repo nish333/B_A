@@ -1,5 +1,6 @@
 package com.MPKA_Group.demo.config;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,10 +26,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SecurityConfig {
 
-    @SuppressWarnings("unused")
-	private final UserDetailsService userDetailsService = null;
+    
+	private UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(null, userDetailsService);
     //private final JwtAuthenticationFilter jwtAuthenticationFilter = null;
+    
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
     
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -53,7 +58,7 @@ public class SecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> 
                 authorize.requestMatchers(HttpMethod.POST, "/bank/add").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/bank/add/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/bank/login").permitAll()
                     .anyRequest().authenticated());
 
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
